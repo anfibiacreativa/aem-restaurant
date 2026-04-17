@@ -168,6 +168,18 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  // scroll-reveal for sections (after lazy-styles.css is loaded)
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  main.querySelectorAll(':scope > .section').forEach((section) => {
+    sectionObserver.observe(section);
+  });
 }
 
 /**

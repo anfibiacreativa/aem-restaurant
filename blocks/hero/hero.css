@@ -1,37 +1,107 @@
+/* hero block — cinematic parallax */
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
 }
 
-.hero {
-  position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+.hero-container {
+  margin: 0;
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 0 24px;
 }
 
 .hero picture {
   position: absolute;
-  z-index: -1;
   inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
+  z-index: -1;
 }
 
 .hero img {
-  object-fit: cover;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: center;
+  will-change: transform;
+}
+
+/* dark overlay for text readability */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(10 10 12 / 40%) 0%,
+    rgb(10 10 12 / 60%) 50%,
+    rgb(10 10 12 / 85%) 100%
+  );
+  pointer-events: none;
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: hero-reveal 1s var(--ease-out-expo) 0.3s forwards;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent-color);
+}
+
+.hero p {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--text-secondary);
+  max-width: 550px;
+  margin: 0 auto 2rem;
+  line-height: 1.65;
+  font-weight: 300;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: hero-reveal 1s var(--ease-out-expo) 0.5s forwards;
+}
+
+.hero .button-wrapper {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: hero-reveal 1s var(--ease-out-expo) 0.7s forwards;
+}
+
+@keyframes hero-reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (width >= 900px) {
   .hero {
-    padding: 40px 32px;
+    padding: 0 32px;
   }
 }

@@ -11,13 +11,20 @@
  */
 
 :root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  /* colors — cinematic dark palette */
+  --background-color: #0a0a0c;
+  --light-color: #141418;
+  --dark-color: #8a8a9a;
+  --text-color: #f0f0f2;
+  --text-secondary: #8a8a9a;
+  --text-tertiary: #55556a;
+  --link-color: #d4a254;
+  --link-hover-color: #e8b96a;
+  --accent-color: #d4a254;
+  --accent-warm: #c0392b;
+  --accent-green: #22c55e;
+  --border-color: rgb(255 255 255 / 6%);
+  --surface-color: #141418;
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -38,6 +45,9 @@
 
   /* nav height */
   --nav-height: 64px;
+
+  /* animation easings */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* fallback fonts */
@@ -78,6 +88,9 @@ body {
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 body.appear {
@@ -199,8 +212,8 @@ button.button:disabled {
 
 a.button.primary,
 button.button.primary {
-  border-color: var(--text-color);
-  background-color: var(--text-color);
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
   color: var(--background-color);
 }
 
@@ -208,9 +221,9 @@ a.button.primary:hover,
 a.button.primary:focus-visible,
 button.button.primary:hover,
 button.button.primary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--dark-color);
-  color: var(--light-color);
+  border-color: var(--link-hover-color);
+  background-color: var(--link-hover-color);
+  color: var(--background-color);
 }
 
 a.button.primary[aria-disabled="true"],
@@ -226,7 +239,7 @@ button.button.primary:disabled:focus-visible {
 
 a.button.secondary,
 button.button.secondary {
-  border-color: var(--text-color);
+  border-color: rgb(255 255 255 / 15%);
   background-color: transparent;
   color: var(--text-color);
 }
@@ -235,9 +248,9 @@ a.button.secondary:hover,
 a.button.secondary:focus-visible,
 button.button.secondary:hover,
 button.button.secondary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--light-color);
-  color: var(--dark-color);
+  border-color: rgb(255 255 255 / 30%);
+  background-color: rgb(255 255 255 / 4%);
+  color: var(--text-color);
 }
 
 a.button.secondary[aria-disabled="true"],
@@ -322,4 +335,23 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+/* cinematic reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 1s var(--ease-out-expo);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dark section variant */
+main .section.dark {
+  background-color: var(--surface-color);
+  margin: 0;
+  padding: 80px 0;
 }

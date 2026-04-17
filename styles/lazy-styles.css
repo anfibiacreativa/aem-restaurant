@@ -1,1 +1,20 @@
-/* add global styles that can be loaded post LCP here */
+/* lazy-styles.css — loaded after LCP for below-the-fold content */
+
+/* Scroll reveal animation for sections */
+main > .section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 1s var(--ease-out-expo);
+}
+
+main > .section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* first section (hero) should not fade in — it has its own animations */
+main > .section:first-of-type {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}

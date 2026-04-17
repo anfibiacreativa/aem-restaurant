@@ -1,0 +1,82 @@
+/* parallax-quote block — cinematic quote with background parallax */
+.parallax-quote-container .parallax-quote-wrapper {
+  max-width: unset;
+  padding: 0;
+}
+
+.parallax-quote-container {
+  margin: 0;
+}
+
+.parallax-quote {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.parallax-quote .parallax-quote-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.parallax-quote .parallax-quote-bg picture {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.parallax-quote .parallax-quote-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.parallax-quote::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(10 10 12 / 70%);
+  pointer-events: none;
+}
+
+.parallax-quote .parallax-quote-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  text-align: center;
+  padding: 80px 24px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s var(--ease-out-expo), transform 1.2s var(--ease-out-expo);
+}
+
+.parallax-quote .parallax-quote-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.parallax-quote .parallax-quote-content blockquote,
+.parallax-quote .parallax-quote-content p {
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text-color);
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.parallax-quote .parallax-quote-content p:last-child {
+  font-size: 0.9rem;
+  font-style: normal;
+  color: var(--accent-color);
+  margin-top: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
