@@ -323,6 +323,18 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
+/* full-bleed sections: hero and parallax-quote need no constraints */
+main > .section.hero-container,
+main > .section.parallax-quote-container {
+  margin: 0;
+}
+
+main > .section.hero-container > div,
+main > .section.parallax-quote-container > div {
+  max-width: unset;
+  padding: 0;
+}
+
 @media (width >= 900px) {
   main > .section > div {
     padding: 0 32px;

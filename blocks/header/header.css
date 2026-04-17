@@ -1,10 +1,13 @@
 /* header and nav layout */
 header .nav-wrapper {
-  background-color: rgb(10 10 12 / 70%);
+  background-color: rgb(10 10 12 / 80%);
   backdrop-filter: blur(20px) saturate(1.5);
   width: 100%;
   z-index: 2;
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.5s var(--ease-out-expo);
 }
@@ -193,6 +196,8 @@ header nav .nav-sections ul {
 
 header nav .nav-sections ul > li {
   font-weight: 500;
+  font-size: var(--body-font-size-xs);
+  letter-spacing: 0.02em;
 }
 
 header nav .nav-sections ul > li > ul {
@@ -242,8 +247,9 @@ header nav .nav-sections ul > li > ul > li {
 
   header nav .nav-sections ul {
     display: flex;
-    gap: 24px;
+    gap: 32px;
     margin: 0;
+    align-items: center;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li {
