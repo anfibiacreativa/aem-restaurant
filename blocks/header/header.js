@@ -124,6 +124,28 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
+  // If nav has only 1 child (single div from DA), split it into brand/sections/tools
+  if (nav.children.length === 1) {
+    const single = nav.children[0];
+    const wrapper = single.querySelector('.default-content-wrapper') || single;
+    const ps = [...wrapper.querySelectorAll(':scope > p')];
+    const ul = wrapper.querySelector(':scope > ul');
+    const brandP = ps[0];
+    const toolsP = ps.length > 1 ? ps[ps.length - 1] : null;
+
+    const makeDiv = (...els) => {
+      const d = document.createElement('div');
+      const w = document.createElement('div');
+      w.className = 'default-content-wrapper';
+      els.forEach((e) => { if (e) w.append(e); });
+      d.append(w);
+      return d;
+    };
+
+    single.remove();
+    nav.append(makeDiv(brandP), makeDiv(ul), makeDiv(toolsP));
+  }
+
   const classes = ['brand', 'sections', 'tools'];
   classes.forEach((c, i) => {
     const section = nav.children[i];
@@ -131,16 +153,18 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    const brandWrapper = brandLink.closest('.button-wrapper');
-    if (brandWrapper) brandWrapper.className = '';
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('a');
+    if (brandLink) {
+      brandLink.className = '';
+      const wrapper = brandLink.closest('p');
+      if (wrapper) wrapper.className = '';
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
-    navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
+    navSections.querySelectorAll('ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {

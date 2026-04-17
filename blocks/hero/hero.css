@@ -1,54 +1,38 @@
-/* hero block — cinematic parallax */
+/* hero block — cinematic full-bleed */
+.hero-container {
+  margin: 0;
+}
+
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
 }
 
-.hero-container {
-  margin: 0;
-}
-
 .hero {
   position: relative;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   overflow: hidden;
-  padding: var(--nav-height) 24px 0;
 }
 
+/* background image — absolute-positioned behind content */
 .hero picture {
   position: absolute;
   inset: 0;
-  z-index: -1;
 }
 
 .hero img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   will-change: transform;
 }
 
-/* dark overlay for text readability */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: radial-gradient(ellipse at center 40%, rgb(212 162 84 / 6%) 0%, transparent 60%);
-  pointer-events: none;
-}
-
+/* dark gradient overlay for readability */
 .hero::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   background: linear-gradient(
     to bottom,
     rgb(10 10 12 / 30%) 0%,
@@ -58,12 +42,24 @@
   pointer-events: none;
 }
 
-.hero h1 {
+/* content wrapper — centers text over image */
+.hero > div {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nav-height) 24px 60px;
+}
+
+.hero > div > div {
+  text-align: center;
   max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+}
+
+/* typography */
+.hero h1 {
   font-size: clamp(3rem, 8vw, 7rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -78,12 +74,9 @@
 .hero h1 em {
   font-style: normal;
   color: var(--accent-color);
-  text-shadow: 0 0 60px rgb(212 162 84 / 20%);
 }
 
 .hero p {
-  position: relative;
-  z-index: 1;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
   color: var(--text-secondary);
   max-width: 550px;
@@ -96,8 +89,6 @@
 }
 
 .hero .button-wrapper {
-  position: relative;
-  z-index: 1;
   opacity: 0;
   transform: translateY(30px);
   animation: hero-reveal 1s var(--ease-out-expo) 0.7s forwards;
@@ -109,7 +100,6 @@
 
 .hero .button.primary {
   box-shadow: 0 0 30px rgb(212 162 84 / 20%);
-  transition: all 0.4s var(--ease-out-expo);
 }
 
 .hero .button.primary:hover {
@@ -125,7 +115,7 @@
 }
 
 @media (width >= 900px) {
-  .hero {
-    padding: 0 32px;
+  .hero > div {
+    padding: var(--nav-height) 32px 60px;
   }
 }
