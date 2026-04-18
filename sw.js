@@ -80,6 +80,22 @@ self.addEventListener('fetch', (event) => {
       });
       const headers = new Headers(resp.headers);
       headers.set('x-web-fragment-id', fragment.fragmentId);
+
+      // Rewrite absolute asset paths in HTML so they route through the SW.
+      // Without this, paths like /_astro/index.css bypass the route prefix.
+      const ct = resp.headers.get('content-type') || '';
+      if (ct.includes('text/html')) {
+        let html = await resp.text();
+        html = html.replaceAll('"/_astro/', `"${prefix}/_astro/`);
+        html = html.replaceAll("'/_astro/", `'${prefix}/_astro/`);
+        headers.set('content-length', new TextEncoder().encode(html).length);
+        return new Response(html, {
+          status: resp.status,
+          statusText: resp.statusText,
+          headers,
+        });
+      }
+
       return new Response(resp.body, {
         status: resp.status,
         statusText: resp.statusText,

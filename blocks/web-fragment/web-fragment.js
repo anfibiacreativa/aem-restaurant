@@ -48,7 +48,17 @@ function ensureServiceWorker() {
   }
   swReady = navigator.serviceWorker
     .register('/sw.js')
-    .then(() => navigator.serviceWorker.ready);
+    .then(() => navigator.serviceWorker.ready)
+    .then((reg) => {
+      if (navigator.serviceWorker.controller) return reg;
+      return new Promise((resolve) => {
+        navigator.serviceWorker.addEventListener(
+          'controllerchange',
+          () => resolve(reg),
+          { once: true },
+        );
+      });
+    });
   return swReady;
 }
 
