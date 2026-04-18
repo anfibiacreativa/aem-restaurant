@@ -267,8 +267,12 @@ export default function decorate(block) {
   btnBar.appendChild(publishBtn);
   block.appendChild(btnBar);
 
-  // --- Stage 2: Preview → show booking app in code area ---
+  // --- Stage 2: Preview → hide IDE chrome, show booking app full-width ---
   previewBtn.addEventListener('click', () => {
+    header.classList.add('eb-hidden');
+    tabBar.classList.add('eb-hidden');
+    sidebar.classList.add('eb-hidden');
+
     codeWrap.innerHTML = '';
     const iframe = document.createElement('iframe');
     iframe.src = previewUrl;
