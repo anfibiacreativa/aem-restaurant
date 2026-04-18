@@ -69,14 +69,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strip the route prefix so the fragment's origin sees its own paths
+  // Strip the route prefix so the fragment's origin sees its own paths.
+  // Don't forward browser headers (Sec-Fetch-*, Origin, etc.) to avoid CORS preflight.
   const strippedPath = url.pathname.slice(prefix.length) || '/';
   event.respondWith(
     (async () => {
       const target = new URL(strippedPath + url.search, fragment.endpoint);
       const resp = await fetch(target.toString(), {
         method: event.request.method,
-        headers: event.request.headers,
       });
       const headers = new Headers(resp.headers);
       headers.set('x-web-fragment-id', fragment.fragmentId);
