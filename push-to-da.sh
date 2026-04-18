@@ -16,12 +16,24 @@ REPO="aem-restaurant"
 API="https://admin.da.live/source/${ORG}/${REPO}"
 
 SKIP_MEDIA=0
+DO_PREVIEW=0
+BRANCH="main"
 ONLY_PAGES=()
 TOKEN=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --skip-media) SKIP_MEDIA=1; shift ;;
+    --preview) DO_PREVIEW=1; shift ;;
+    --branch)
+      shift
+      BRANCH="${1:-main}"
+      shift
+      ;;
+    --branch=*)
+      BRANCH="${1#*=}"
+      shift
+      ;;
     --only-page)
       shift
       _OP="${1:-}"
@@ -39,6 +51,8 @@ while [ $# -gt 0 ]; do
     -h|--help)
       echo "Usage: $0 <DA_BEARER_TOKEN> [options]"
       echo "  --skip-media              Push HTML only; no media uploads."
+      echo "  --preview                 Preview pages on EDS after uploading."
+      echo "  --branch <name>           Git branch for preview (default: main)."
       echo "  --only-page <path>        Upload one specific page (repeatable)."
       echo "  --only-page=<path>        Same as above."
       exit 0
@@ -201,6 +215,34 @@ echo "=========================================="
 
 if [ "$SUCCESS" -gt 0 ]; then
   echo ""
-  echo "Preview: https://main--${REPO}--${ORG}.aem.page/"
   echo "DA edit: https://da.live/#/${ORG}/${REPO}"
+
+  if [ "$DO_PREVIEW" = "1" ]; then
+    echo ""
+    echo "=========================================="
+    echo " Previewing pages on EDS"
+    echo "=========================================="
+    PREVIEW_OK=0
+    PREVIEW_FAIL=0
+    for page in "${PAGES[@]+"${PAGES[@]}"}"; do
+      PREV_PATH="${page%.html}"
+      PREV_PATH="${PREV_PATH%/index}"
+      [ -z "$PREV_PATH" ] && PREV_PATH="index"
+      PREV_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST "https://admin.hlx.page/preview/${ORG}/${REPO}/${BRANCH}/${PREV_PATH}" \
+        -H "Authorization: Bearer ${TOKEN}")
+      if [ "$PREV_CODE" = "200" ] || [ "$PREV_CODE" = "201" ] || [ "$PREV_CODE" = "204" ]; then
+        echo "  OK: preview/${PREV_PATH} (${PREV_CODE})"
+        ((PREVIEW_OK++))
+      else
+        echo "FAIL: preview/${PREV_PATH} (HTTP ${PREV_CODE})"
+        ((PREVIEW_FAIL++))
+      fi
+    done
+    echo ""
+    echo "Preview results: ${PREVIEW_OK} ok, ${PREVIEW_FAIL} failed"
+  fi
+
+  echo ""
+  echo "Preview: https://${BRANCH}--${REPO}--${ORG}.aem.page/"
 fi

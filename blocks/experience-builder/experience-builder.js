@@ -1,5 +1,5 @@
 /**
- * App Builder block — scripted mock code editor.
+ * Experience Builder block — scripted mock code editor.
  *
  * Renders a dark-themed editor panel that "streams" pre-recorded code
  * with a typewriter effect. Shows connection badges and Preview/Deploy
@@ -118,26 +118,16 @@ function escapeHtml(str) {
 
 function highlight(raw) {
   let h = escapeHtml(raw);
-  // Astro frontmatter fences
-  h = h.replace(/^(---)$/gm, '<span class="ab-fence">$1</span>');
-  // Block comments
-  h = h.replace(/(\/\*\*[\s\S]*?\*\/)/g, '<span class="ab-comment">$1</span>');
-  // Single-line comments
-  h = h.replace(/(\/\/.*)/g, '<span class="ab-comment">$1</span>');
-  // HTML comments
-  h = h.replace(/(&lt;!--.*?--&gt;)/g, '<span class="ab-comment">$1</span>');
-  // Strings (double-quoted)
-  h = h.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="ab-string">$1</span>');
-  // Strings (single-quoted)
-  h = h.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="ab-string">$1</span>');
-  // Template literals (backtick)
-  h = h.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="ab-string">$1</span>');
-  // HTML tags
-  h = h.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="ab-tag">$2</span>');
-  // HTML attributes
-  h = h.replace(/\b(class|type|name|id|required|disabled|placeholder|autocomplete|value|min|novalidate|selected)\b(?==)/g, '<span class="ab-attr">$1</span>');
-  // JS keywords
-  h = h.replace(/\b(const|let|var|function|return|if|new|try|catch|async|await|import|from|export)\b/g, '<span class="ab-kw">$1</span>');
+  h = h.replace(/^(---)$/gm, '<span class="eb-fence">$1</span>');
+  h = h.replace(/(\/\*\*[\s\S]*?\*\/)/g, '<span class="eb-comment">$1</span>');
+  h = h.replace(/(\/\/.*)/g, '<span class="eb-comment">$1</span>');
+  h = h.replace(/(&lt;!--.*?--&gt;)/g, '<span class="eb-comment">$1</span>');
+  h = h.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="eb-string">$1</span>');
+  h = h.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="eb-string">$1</span>');
+  h = h.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="eb-string">$1</span>');
+  h = h.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="eb-tag">$2</span>');
+  h = h.replace(/\b(class|type|name|id|required|disabled|placeholder|autocomplete|value|min|novalidate|selected)\b(?==)/g, '<span class="eb-attr">$1</span>');
+  h = h.replace(/\b(const|let|var|function|return|if|new|try|catch|async|await|import|from|export)\b/g, '<span class="eb-kw">$1</span>');
   return h;
 }
 
@@ -160,39 +150,36 @@ export default function decorate(block) {
 
   block.textContent = '';
 
-  // Header with badges
   const header = document.createElement('div');
-  header.className = 'ab-header';
+  header.className = 'eb-header';
   header.innerHTML = `
-    <span class="ab-title">BookingForm.astro</span>
-    <div class="ab-badges">
-      <span class="ab-badge"><span class="ab-dot"></span>Connected to Figma</span>
-      <span class="ab-badge"><span class="ab-dot"></span>Connected to Enterprise Ground Truth</span>
+    <span class="eb-title">BookingForm.astro</span>
+    <div class="eb-badges">
+      <span class="eb-badge"><span class="eb-dot"></span>Connected to Figma</span>
+      <span class="eb-badge"><span class="eb-dot"></span>Connected to Enterprise Ground Truth</span>
     </div>`;
   block.appendChild(header);
 
-  // Code area
   const codeWrap = document.createElement('div');
-  codeWrap.className = 'ab-code-wrap';
+  codeWrap.className = 'eb-code-wrap';
   const pre = document.createElement('pre');
   const code = document.createElement('code');
   pre.appendChild(code);
   codeWrap.appendChild(pre);
   block.appendChild(codeWrap);
 
-  // Button bar (hidden until streaming completes)
   const btnBar = document.createElement('div');
-  btnBar.className = 'ab-buttons ab-hidden';
+  btnBar.className = 'eb-buttons eb-hidden';
 
   const previewBtn = document.createElement('a');
-  previewBtn.className = 'ab-btn ab-btn-primary';
+  previewBtn.className = 'eb-btn eb-btn-primary';
   previewBtn.textContent = 'Preview';
   previewBtn.href = previewUrl;
   previewBtn.target = '_blank';
   previewBtn.rel = 'noopener';
 
   const deployBtn = document.createElement('button');
-  deployBtn.className = 'ab-btn ab-btn-deploy';
+  deployBtn.className = 'eb-btn eb-btn-deploy';
   deployBtn.textContent = 'Deploy';
   deployBtn.type = 'button';
   deployBtn.dataset.tooltip = 'This is an independently deployed micro-frontend';
@@ -202,21 +189,32 @@ export default function decorate(block) {
   btnBar.appendChild(deployBtn);
   block.appendChild(btnBar);
 
-  // Typewriter animation
   const CHARS_PER_TICK = 3;
   const TICK_MS = 18;
-  let pos = 0;
 
-  const timer = setInterval(() => {
-    pos = Math.min(pos + CHARS_PER_TICK, CODE.length);
-    const visible = CODE.slice(0, pos);
-    code.innerHTML = highlight(visible) + '<span class="ab-cursor"></span>';
-    codeWrap.scrollTop = codeWrap.scrollHeight;
+  function startAnimation() {
+    let pos = 0;
+    const timer = setInterval(() => {
+      pos = Math.min(pos + CHARS_PER_TICK, CODE.length);
+      const visible = CODE.slice(0, pos);
+      code.innerHTML = highlight(visible) + '<span class="eb-cursor"></span>';
+      codeWrap.scrollTop = codeWrap.scrollHeight;
 
-    if (pos >= CODE.length) {
-      clearInterval(timer);
-      code.innerHTML = highlight(CODE);
-      btnBar.classList.remove('ab-hidden');
-    }
-  }, TICK_MS);
+      if (pos >= CODE.length) {
+        clearInterval(timer);
+        code.innerHTML = highlight(CODE);
+        btnBar.classList.remove('eb-hidden');
+      }
+    }, TICK_MS);
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        observer.disconnect();
+        startAnimation();
+      }
+    });
+  }, { threshold: 0.15 });
+  observer.observe(block);
 }

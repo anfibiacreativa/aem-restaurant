@@ -1,4 +1,4 @@
-.app-builder {
+.experience-builder {
   display: flex;
   flex-direction: column;
   border-radius: 12px;
@@ -12,7 +12,7 @@
 
 /* ── Header ───────────────────────────────────────────── */
 
-.ab-header {
+.eb-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -23,20 +23,20 @@
   border-bottom: 1px solid #2a2a3c;
 }
 
-.ab-title {
+.eb-title {
   font-size: 13px;
   font-weight: 600;
   color: #cdd6f4;
   letter-spacing: 0.02em;
 }
 
-.ab-badges {
+.eb-badges {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.ab-badge {
+.eb-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -49,7 +49,7 @@
   white-space: nowrap;
 }
 
-.ab-dot {
+.eb-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -59,7 +59,7 @@
 
 /* ── Code area ────────────────────────────────────────── */
 
-.ab-code-wrap {
+.eb-code-wrap {
   flex: 1;
   overflow-y: auto;
   max-height: 420px;
@@ -68,57 +68,57 @@
   scrollbar-color: #313244 transparent;
 }
 
-.ab-code-wrap pre {
+.eb-code-wrap pre {
   margin: 0;
   white-space: pre;
   tab-size: 2;
 }
 
-.ab-code-wrap code {
+.eb-code-wrap code {
   font-size: 13px;
   line-height: 1.65;
   color: #cdd6f4;
 }
 
 /* Syntax highlighting (Catppuccin-inspired) */
-.ab-fence   { color: #f38ba8; font-weight: 700; }
-.ab-comment { color: #6c7086; font-style: italic; }
-.ab-string  { color: #a6e3a1; }
-.ab-tag     { color: #89b4fa; }
-.ab-attr    { color: #f9e2af; }
-.ab-kw      { color: #cba6f7; }
+.eb-fence   { color: #f38ba8; font-weight: 700; }
+.eb-comment { color: #6c7086; font-style: italic; }
+.eb-string  { color: #a6e3a1; }
+.eb-tag     { color: #89b4fa; }
+.eb-attr    { color: #f9e2af; }
+.eb-kw      { color: #cba6f7; }
 
 /* Blinking cursor */
-.ab-cursor {
+.eb-cursor {
   display: inline-block;
   width: 8px;
   height: 1.1em;
   margin-left: 1px;
   vertical-align: text-bottom;
   background: #cdd6f4;
-  animation: ab-blink 0.8s step-end infinite;
+  animation: eb-blink 0.8s step-end infinite;
 }
 
-@keyframes ab-blink {
+@keyframes eb-blink {
   50% { opacity: 0; }
 }
 
 /* ── Buttons ──────────────────────────────────────────── */
 
-.ab-buttons {
+.eb-buttons {
   display: flex;
   gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-top: 1px solid #2a2a3c;
   background: #181825;
-  animation: ab-fade-in 0.4s ease-out;
+  animation: eb-fade-in 0.4s ease-out;
 }
 
-.ab-hidden {
+.eb-hidden {
   display: none !important;
 }
 
-.ab-btn {
+.eb-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,31 +132,31 @@
   transition: background 0.15s, border-color 0.15s;
 }
 
-.ab-btn-primary {
+.eb-btn-primary {
   background: #89b4fa;
   color: #1e1e2e;
   border: 1px solid #89b4fa;
 }
 
-.ab-btn-primary:hover {
+.eb-btn-primary:hover {
   background: #b4d0fb;
   border-color: #b4d0fb;
 }
 
-.ab-btn-deploy {
+.eb-btn-deploy {
   position: relative;
   background: transparent;
   color: #a6adc8;
   border: 1px solid #313244;
 }
 
-.ab-btn-deploy:hover {
+.eb-btn-deploy:hover {
   border-color: #45475a;
   background: rgba(255, 255, 255, 0.04);
 }
 
 /* Tooltip */
-.ab-btn-deploy::after {
+.eb-btn-deploy::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 8px);
@@ -175,11 +175,11 @@
   transition: opacity 0.2s;
 }
 
-.ab-btn-deploy:hover::after {
+.eb-btn-deploy:hover::after {
   opacity: 1;
 }
 
-@keyframes ab-fade-in {
+@keyframes eb-fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }

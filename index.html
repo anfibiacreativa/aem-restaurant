@@ -12,18 +12,22 @@
     <p><em><a href="/about">Our Story</a></em></p>
   </div>
 
-  <!-- Cinematic quote section -->
+  <!-- Cinematic quote section — cell divs required for DA ingestion -->
   <div>
     <div class="parallax-quote">
       <div>
-        <picture>
-          <source type="image/webp" srcset="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&q=80" media="(min-width: 600px)">
-          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=60" alt="Beautifully plated gourmet dish" loading="lazy" width="1600" height="900">
-        </picture>
+        <div>
+          <picture>
+            <source type="image/webp" srcset="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&q=80" media="(min-width: 600px)">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=60" alt="Beautifully plated gourmet dish" loading="lazy" width="1600" height="900">
+          </picture>
+        </div>
       </div>
       <div>
-        <p>"Cooking is an art, but all art requires knowing something about the techniques and materials."</p>
-        <p>— Our Philosophy</p>
+        <div>
+          <p>"Cooking is an art, but all art requires knowing something about the techniques and materials."</p>
+          <p>— Our Philosophy</p>
+        </div>
       </div>
     </div>
   </div>
@@ -68,6 +72,13 @@
           <p>Warm lighting, curated music, and thoughtful design create an atmosphere where every meal becomes an occasion.</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Experience builder — mock code editor, animation starts on scroll -->
+  <div>
+    <div class="experience-builder">
+      <div><div>preview-url</div><div>https://feat-web-fragment-sw--aem-restaurant--anfibiacreativa.aem.page/</div></div>
     </div>
   </div>
 </main>
