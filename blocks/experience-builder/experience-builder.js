@@ -1,11 +1,13 @@
 /**
  * Experience Builder block — scripted mock code editor.
  *
- * Renders a dark-themed IDE panel with file tree, tabs, and streaming code.
- * Preview button embeds the real booking app via iframe.
+ * Three-stage flow:
+ *   1. Code streams in with typewriter animation (scroll-triggered)
+ *   2. Preview replaces code area with live booking app iframe
+ *   3. Deploy shows progress bar → "Publish to DA" button appears
  *
  * Authoring contract (table rows):
- *   preview-url  | <fragment app URL, e.g. https://aem-restaurant-booking.pages.dev>
+ *   preview-url  | <fragment app URL>
  */
 
 const CODE = `---
@@ -85,14 +87,12 @@ const CODE = `---
     const data = Object.fromEntries(new FormData(form));
     const booking = { ...data, id: crypto.randomUUID() };
 
-    // Persist locally
     const all = JSON.parse(
       sessionStorage.getItem('bookings') || '[]'
     );
     all.push(booking);
     sessionStorage.setItem('bookings', JSON.stringify(all));
 
-    // Notify the host page
     const bc = new BroadcastChannel(CHANNEL);
     bc.postMessage({
       type: 'reservation_confirmed',
@@ -217,7 +217,7 @@ export default function decorate(block) {
     </div>`;
   block.appendChild(tabBar);
 
-  // --- Main body: file tree + code ---
+  // --- Main body: sidebar + code ---
   const body = document.createElement('div');
   body.className = 'eb-body';
 
@@ -236,10 +236,10 @@ export default function decorate(block) {
 
   block.appendChild(body);
 
-  // --- Preview frame (hidden until Preview clicked) ---
-  const previewFrame = document.createElement('div');
-  previewFrame.className = 'eb-preview-frame eb-hidden';
-  block.appendChild(previewFrame);
+  // --- Status bar (progress bar + publish, hidden initially) ---
+  const statusBar = document.createElement('div');
+  statusBar.className = 'eb-status-bar eb-hidden';
+  block.appendChild(statusBar);
 
   // --- Button bar ---
   const btnBar = document.createElement('div');
@@ -255,26 +255,70 @@ export default function decorate(block) {
   deployBtn.className = 'eb-btn eb-btn-deploy';
   deployBtn.textContent = 'Deploy';
   deployBtn.type = 'button';
-  deployBtn.dataset.tooltip = 'This is an independently deployed micro-frontend';
-  deployBtn.addEventListener('click', (e) => e.preventDefault());
+  deployBtn.disabled = true;
+
+  const publishBtn = document.createElement('button');
+  publishBtn.className = 'eb-btn eb-btn-publish eb-hidden';
+  publishBtn.textContent = 'Publish to DA';
+  publishBtn.type = 'button';
 
   btnBar.appendChild(previewBtn);
   btnBar.appendChild(deployBtn);
+  btnBar.appendChild(publishBtn);
   block.appendChild(btnBar);
 
-  // --- Preview click: replace editor with live app ---
+  // --- Stage 2: Preview → show booking app in code area ---
   previewBtn.addEventListener('click', () => {
-    header.classList.add('eb-hidden');
-    tabBar.classList.add('eb-hidden');
-    body.classList.add('eb-hidden');
-    btnBar.classList.add('eb-hidden');
-
-    previewFrame.classList.remove('eb-hidden');
+    codeWrap.innerHTML = '';
     const iframe = document.createElement('iframe');
     iframe.src = previewUrl;
     iframe.className = 'eb-preview-iframe';
     iframe.setAttribute('loading', 'eager');
-    previewFrame.appendChild(iframe);
+    codeWrap.appendChild(iframe);
+    codeWrap.classList.add('eb-preview-mode');
+
+    previewBtn.classList.remove('eb-btn-ready');
+    previewBtn.classList.add('eb-btn-active-state');
+    previewBtn.disabled = true;
+
+    deployBtn.disabled = false;
+    deployBtn.classList.add('eb-btn-ready');
+  });
+
+  // --- Stage 3: Deploy → progress bar → Publish to DA ---
+  deployBtn.addEventListener('click', () => {
+    deployBtn.disabled = true;
+    deployBtn.classList.remove('eb-btn-ready');
+    deployBtn.classList.add('eb-btn-active-state');
+
+    statusBar.classList.remove('eb-hidden');
+    statusBar.innerHTML = `
+      <div class="eb-progress-wrap">
+        <span class="eb-progress-label">Deploying experience to CDN...</span>
+        <div class="eb-progress-track">
+          <div class="eb-progress-bar"></div>
+        </div>
+      </div>`;
+
+    const bar = statusBar.querySelector('.eb-progress-bar');
+    let pct = 0;
+    const tick = setInterval(() => {
+      pct += 2 + Math.random() * 4;
+      if (pct >= 100) {
+        pct = 100;
+        clearInterval(tick);
+
+        statusBar.querySelector('.eb-progress-label').textContent = 'Deployed to CDN ✓';
+        bar.style.width = '100%';
+        bar.classList.add('eb-progress-done');
+
+        setTimeout(() => {
+          publishBtn.classList.remove('eb-hidden');
+          publishBtn.classList.add('eb-btn-publish-ready');
+        }, 400);
+      }
+      bar.style.width = `${pct}%`;
+    }, 80);
   });
 
   // --- Typewriter animation (starts on scroll) ---

@@ -193,6 +193,21 @@
   color: #cdd6f4;
 }
 
+/* Preview mode: code area becomes iframe container */
+.eb-code-wrap.eb-preview-mode {
+  padding: 0;
+  background: #fff;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.eb-preview-iframe {
+  width: 100%;
+  height: 420px;
+  border: none;
+  display: block;
+}
+
 /* Syntax highlighting (Catppuccin-inspired) */
 .eb-fence   { color: #f38ba8; font-weight: 700; }
 .eb-comment { color: #6c7086; font-style: italic; }
@@ -214,6 +229,44 @@
 
 @keyframes eb-blink {
   50% { opacity: 0; }
+}
+
+/* ── Status bar (progress + deploy status) ────────────── */
+
+.eb-status-bar {
+  padding: 0.5rem 1rem;
+  background: #181825;
+  border-top: 1px solid #2a2a3c;
+}
+
+.eb-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eb-progress-label {
+  font-size: 12px;
+  color: #a6adc8;
+}
+
+.eb-progress-track {
+  height: 4px;
+  background: #313244;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.eb-progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #89b4fa, #cba6f7);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.eb-progress-bar.eb-progress-done {
+  background: #a6e3a1;
 }
 
 /* ── Buttons ──────────────────────────────────────────── */
@@ -242,24 +295,27 @@
   cursor: pointer;
   text-decoration: none;
   border: 1px solid;
-  transition: background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s, color 0.2s;
 }
 
-/* Preview button — disabled state */
+/* Disabled state (shared) */
+.eb-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Preview button — disabled */
 .eb-btn-preview {
   background: #313244;
   color: #6c7086;
   border-color: #313244;
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
-/* Preview button — ready state (green) */
+/* Preview button — ready (green) */
 .eb-btn-preview.eb-btn-ready {
   background: #a6e3a1;
   color: #1e1e2e;
   border-color: #a6e3a1;
-  cursor: pointer;
   opacity: 1;
   box-shadow: 0 0 12px rgba(166, 227, 161, 0.3);
   animation: eb-ready-glow 2s ease-in-out infinite;
@@ -271,67 +327,63 @@
   box-shadow: 0 0 20px rgba(166, 227, 161, 0.5);
 }
 
+/* Active/clicked state (stays after click) */
+.eb-btn-active-state {
+  background: #45475a !important;
+  color: #a6adc8 !important;
+  border-color: #45475a !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
 @keyframes eb-ready-glow {
   0%, 100% { box-shadow: 0 0 12px rgba(166, 227, 161, 0.3); }
   50% { box-shadow: 0 0 20px rgba(166, 227, 161, 0.5); }
 }
 
+/* Deploy button — disabled */
 .eb-btn-deploy {
-  position: relative;
   background: transparent;
-  color: #a6adc8;
+  color: #6c7086;
   border-color: #313244;
 }
 
-.eb-btn-deploy:hover {
-  border-color: #45475a;
-  background: rgba(255, 255, 255, 0.04);
-}
-
-/* Tooltip */
-.eb-btn-deploy::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: #11111b;
-  border: 1px solid #313244;
-  color: #cdd6f4;
-  font-size: 11px;
-  font-weight: 400;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.eb-btn-deploy:hover::after {
+/* Deploy button — ready (blue) */
+.eb-btn-deploy.eb-btn-ready {
+  background: #89b4fa;
+  color: #1e1e2e;
+  border-color: #89b4fa;
   opacity: 1;
 }
 
-/* ── Preview frame (replaces editor) ──────────────────── */
-
-.eb-preview-frame {
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 0 0 12px 12px;
-  overflow: hidden;
-  animation: eb-preview-in 0.5s ease-out;
+.eb-btn-deploy.eb-btn-ready:hover {
+  background: #b4d0fb;
+  border-color: #b4d0fb;
 }
 
-.eb-preview-iframe {
-  width: 100%;
-  height: 520px;
-  border: none;
+/* Publish to DA button */
+.eb-btn-publish {
+  background: transparent;
+  color: #6c7086;
+  border-color: #313244;
 }
 
-@keyframes eb-preview-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
+.eb-btn-publish.eb-btn-publish-ready {
+  background: #f9e2af;
+  color: #1e1e2e;
+  border-color: #f9e2af;
+  animation: eb-publish-appear 0.4s ease-out;
+}
+
+.eb-btn-publish.eb-btn-publish-ready:hover {
+  background: #fcecc8;
+  border-color: #fcecc8;
+}
+
+@keyframes eb-publish-appear {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive ───────────────────────────────────────── */
