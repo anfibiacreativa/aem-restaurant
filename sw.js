@@ -20,6 +20,7 @@ self.addEventListener('message', (event) => {
   const { type, ...config } = event.data || {};
   if (type !== 'register-fragment' || !config.fragmentId) return;
   fragments.set(config.fragmentId, config);
+  if (event.ports[0]) event.ports[0].postMessage({ type: 'registered' });
 });
 
 // ── Simple route matching ────────────────────────────────────────────

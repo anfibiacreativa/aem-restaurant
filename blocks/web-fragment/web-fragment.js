@@ -52,16 +52,21 @@ function ensureServiceWorker() {
   return swReady;
 }
 
-async function registerFragment(config) {
-  const reg = await ensureServiceWorker();
-  if (!reg?.active) return;
-  reg.active.postMessage({
-    type: 'register-fragment',
-    fragmentId: config['fragment-id'],
-    endpoint: config.endpoint,
-    routePatterns: config.routes
-      ? config.routes.split(',').map((r) => r.trim())
-      : [`/__wf/${config['fragment-id']}`, `/__wf/${config['fragment-id']}/:_*`],
+function registerFragment(config) {
+  return ensureServiceWorker().then((reg) => {
+    if (!reg?.active) return;
+    return new Promise((resolve) => {
+      const mc = new MessageChannel();
+      mc.port1.onmessage = () => resolve();
+      reg.active.postMessage({
+        type: 'register-fragment',
+        fragmentId: config['fragment-id'],
+        endpoint: config.endpoint,
+        routePatterns: config.routes
+          ? config.routes.split(',').map((r) => r.trim())
+          : [`/__wf/${config['fragment-id']}`, `/__wf/${config['fragment-id']}/:_*`],
+      }, [mc.port2]);
+    });
   });
 }
 
@@ -85,7 +90,10 @@ export default async function decorate(block) {
 
   const el = document.createElement('web-fragment');
   el.setAttribute('fragment-id', fragmentId);
-  el.setAttribute('src', config.endpoint);
+  const basePath = config.routes
+    ? config.routes.split(',')[0].trim().replace(/\/:.*$/, '')
+    : `/__wf/${fragmentId}`;
+  el.setAttribute('src', basePath);
 
   block.textContent = '';
   block.appendChild(el);
