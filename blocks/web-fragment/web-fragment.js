@@ -70,6 +70,35 @@ function registerFragment(config) {
   });
 }
 
+function listenForFragmentEvents(channels) {
+  channels.forEach((name) => {
+    const bc = new BroadcastChannel(name);
+    bc.addEventListener('message', (event) => {
+      const { type, booking } = event.data || {};
+      if (type !== 'reservation_confirmed' || !booking) return;
+
+      const existing = document.querySelector('.wf-banner');
+      if (existing) existing.remove();
+
+      const banner = document.createElement('div');
+      banner.className = 'wf-banner';
+      banner.setAttribute('role', 'status');
+      banner.innerHTML = `
+        <p>
+          <strong>Your reservation is confirmed${booking.name ? `, ${booking.name}` : ''}!</strong>
+          If you have any allergies or intolerances, please let us know.
+        </p>
+        <button type="button" aria-label="Dismiss">&times;</button>`;
+      banner.querySelector('button').addEventListener('click', () => banner.remove());
+      document.querySelector('main')?.prepend(banner);
+      setTimeout(() => {
+        banner.classList.add('wf-banner--dismiss');
+        setTimeout(() => banner.remove(), 600);
+      }, 10000);
+    });
+  });
+}
+
 export default async function decorate(block) {
   const config = parseConfig(block);
   const fragmentId = config['fragment-id'];
@@ -87,6 +116,8 @@ export default async function decorate(block) {
     ensureWebFragments(),
     registerFragment(config),
   ]);
+
+  listenForFragmentEvents(['/reservations']);
 
   const el = document.createElement('web-fragment');
   el.setAttribute('fragment-id', fragmentId);
