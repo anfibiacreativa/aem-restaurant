@@ -31,7 +31,9 @@ function matchFragment(pathname) {
   for (const [, frag] of fragments) {
     for (const pattern of frag.routePatterns) {
       const prefix = pattern.replace(/\/:.*$/, '');
-      if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return frag;
+      if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+        return { fragment: frag, prefix };
+      }
     }
   }
   return null;
@@ -43,8 +45,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  const fragment = matchFragment(url.pathname);
-  if (!fragment) return;
+  const match = matchFragment(url.pathname);
+  if (!match) return;
+  const { fragment, prefix } = match;
 
   const dest =
     event.request.headers.get('sec-fetch-dest') || event.request.destination;
@@ -66,10 +69,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Everything else → proxy to the fragment endpoint
+  // Strip the route prefix so the fragment's origin sees its own paths
+  const strippedPath = url.pathname.slice(prefix.length) || '/';
   event.respondWith(
     (async () => {
-      const target = new URL(url.pathname + url.search, fragment.endpoint);
+      const target = new URL(strippedPath + url.search, fragment.endpoint);
       const resp = await fetch(target.toString(), {
         method: event.request.method,
         headers: event.request.headers,
