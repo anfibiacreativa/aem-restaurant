@@ -1,0 +1,10 @@
+.web-fragment {
+  display: block;
+  min-height: 200px;
+  position: relative;
+}
+
+.web-fragment web-fragment {
+  display: block;
+  width: 100%;
+}
