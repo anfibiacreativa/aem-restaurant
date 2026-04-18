@@ -1,12 +1,11 @@
 /**
  * Experience Builder block — scripted mock code editor.
  *
- * Renders a dark-themed editor panel that "streams" pre-recorded code
- * with a typewriter effect. Shows connection badges and Preview/Deploy
- * buttons when the animation completes. Purely visual — no real compilation.
+ * Renders a dark-themed IDE panel with file tree, tabs, and streaming code.
+ * Preview button embeds the real booking app via iframe.
  *
  * Authoring contract (table rows):
- *   preview-url  | <EDS preview URL>
+ *   preview-url  | <fragment app URL, e.g. https://aem-restaurant-booking.pages.dev>
  */
 
 const CODE = `---
@@ -112,6 +111,28 @@ const CODE = `---
   .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
 </style>`;
 
+const FILE_TREE = [
+  { name: 'src', type: 'dir', open: true, children: [
+    { name: 'components', type: 'dir', open: true, children: [
+      { name: 'BookingForm.astro', type: 'file', active: true },
+    ]},
+    { name: 'layouts', type: 'dir', children: [
+      { name: 'Layout.astro', type: 'file' },
+    ]},
+    { name: 'pages', type: 'dir', children: [
+      { name: 'index.astro', type: 'file' },
+    ]},
+    { name: 'styles', type: 'dir', children: [
+      { name: 'global.css', type: 'file' },
+    ]},
+  ]},
+  { name: 'public', type: 'dir', children: [
+    { name: '_headers', type: 'file' },
+  ]},
+  { name: 'package.json', type: 'file' },
+  { name: 'astro.config.mjs', type: 'file' },
+];
+
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -131,6 +152,28 @@ function highlight(raw) {
   return h;
 }
 
+function renderFileTree(items, depth = 0) {
+  return items.map((item) => {
+    const indent = depth * 16;
+    const isOpen = item.open;
+    if (item.type === 'dir') {
+      const chevron = isOpen ? '▾' : '▸';
+      const icon = isOpen ? '📂' : '📁';
+      const kids = isOpen && item.children ? renderFileTree(item.children, depth + 1) : '';
+      return `<div class="eb-tree-item eb-tree-dir" style="padding-left:${indent}px">`
+        + `<span class="eb-tree-chevron">${chevron}</span>`
+        + `<span class="eb-tree-icon">${icon}</span>`
+        + `<span class="eb-tree-name">${item.name}</span>`
+        + `</div>${kids}`;
+    }
+    const active = item.active ? ' eb-tree-active' : '';
+    return `<div class="eb-tree-item eb-tree-file${active}" style="padding-left:${indent + 16}px">`
+      + `<span class="eb-tree-icon">📄</span>`
+      + `<span class="eb-tree-name">${item.name}</span>`
+      + `</div>`;
+  }).join('');
+}
+
 function parseConfig(block) {
   const cfg = {};
   [...block.children].forEach((row) => {
@@ -146,19 +189,42 @@ function parseConfig(block) {
 
 export default function decorate(block) {
   const config = parseConfig(block);
-  const previewUrl = config['preview-url'] || '#';
+  const previewUrl = config['preview-url'] || 'https://aem-restaurant-booking.pages.dev';
 
   block.textContent = '';
 
+  // --- Header: badges ---
   const header = document.createElement('div');
   header.className = 'eb-header';
   header.innerHTML = `
-    <span class="eb-title">BookingForm.astro</span>
     <div class="eb-badges">
       <span class="eb-badge"><span class="eb-dot"></span>Connected to Figma</span>
       <span class="eb-badge"><span class="eb-dot"></span>Connected to Enterprise Ground Truth</span>
     </div>`;
   block.appendChild(header);
+
+  // --- Tab bar ---
+  const tabBar = document.createElement('div');
+  tabBar.className = 'eb-tabs';
+  tabBar.innerHTML = `
+    <div class="eb-tab eb-tab-active">
+      <span class="eb-tab-name">BookingForm.astro</span>
+      <span class="eb-tab-close">×</span>
+    </div>
+    <div class="eb-tab">
+      <span class="eb-tab-name">global.css</span>
+      <span class="eb-tab-agent-dot" title="Agent is working..."></span>
+    </div>`;
+  block.appendChild(tabBar);
+
+  // --- Main body: file tree + code ---
+  const body = document.createElement('div');
+  body.className = 'eb-body';
+
+  const sidebar = document.createElement('div');
+  sidebar.className = 'eb-sidebar';
+  sidebar.innerHTML = `<div class="eb-sidebar-title">EXPLORER</div>${renderFileTree(FILE_TREE)}`;
+  body.appendChild(sidebar);
 
   const codeWrap = document.createElement('div');
   codeWrap.className = 'eb-code-wrap';
@@ -166,17 +232,24 @@ export default function decorate(block) {
   const code = document.createElement('code');
   pre.appendChild(code);
   codeWrap.appendChild(pre);
-  block.appendChild(codeWrap);
+  body.appendChild(codeWrap);
 
+  block.appendChild(body);
+
+  // --- Preview frame (hidden until Preview clicked) ---
+  const previewFrame = document.createElement('div');
+  previewFrame.className = 'eb-preview-frame eb-hidden';
+  block.appendChild(previewFrame);
+
+  // --- Button bar ---
   const btnBar = document.createElement('div');
-  btnBar.className = 'eb-buttons eb-hidden';
+  btnBar.className = 'eb-buttons';
 
-  const previewBtn = document.createElement('a');
-  previewBtn.className = 'eb-btn eb-btn-primary';
+  const previewBtn = document.createElement('button');
+  previewBtn.className = 'eb-btn eb-btn-preview';
   previewBtn.textContent = 'Preview';
-  previewBtn.href = previewUrl;
-  previewBtn.target = '_blank';
-  previewBtn.rel = 'noopener';
+  previewBtn.type = 'button';
+  previewBtn.disabled = true;
 
   const deployBtn = document.createElement('button');
   deployBtn.className = 'eb-btn eb-btn-deploy';
@@ -189,6 +262,22 @@ export default function decorate(block) {
   btnBar.appendChild(deployBtn);
   block.appendChild(btnBar);
 
+  // --- Preview click: replace editor with live app ---
+  previewBtn.addEventListener('click', () => {
+    header.classList.add('eb-hidden');
+    tabBar.classList.add('eb-hidden');
+    body.classList.add('eb-hidden');
+    btnBar.classList.add('eb-hidden');
+
+    previewFrame.classList.remove('eb-hidden');
+    const iframe = document.createElement('iframe');
+    iframe.src = previewUrl;
+    iframe.className = 'eb-preview-iframe';
+    iframe.setAttribute('loading', 'eager');
+    previewFrame.appendChild(iframe);
+  });
+
+  // --- Typewriter animation (starts on scroll) ---
   const CHARS_PER_TICK = 3;
   const TICK_MS = 18;
 
@@ -203,7 +292,8 @@ export default function decorate(block) {
       if (pos >= CODE.length) {
         clearInterval(timer);
         code.innerHTML = highlight(CODE);
-        btnBar.classList.remove('eb-hidden');
+        previewBtn.disabled = false;
+        previewBtn.classList.add('eb-btn-ready');
       }
     }, TICK_MS);
   }
